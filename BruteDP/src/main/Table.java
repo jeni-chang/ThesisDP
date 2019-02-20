@@ -9,6 +9,7 @@ public class Table {
 	private int S; // server
 	private int C; // check point
 	private boolean check;
+	private boolean capacity_check;
 	private double ans;
 	private double cost;
 	private double remain;
@@ -22,6 +23,7 @@ public class Table {
 		this.ans = -1.0;
 		this.cost = -1.0;
 		this.check = false;
+		this.capacity_check = true;
 		this.pb = new HashMap<>();
 	}
 	
@@ -51,6 +53,11 @@ public class Table {
 	
 	public void setcheck(boolean b) {
 		this.check = b;
+	}
+	
+	// set capacity check
+	public void set_capa_check(boolean b) { 
+		this.capacity_check = b;
 	}
 	
 	public void setChoose(String s) {
@@ -91,6 +98,9 @@ public class Table {
 	
 	public boolean getcheck() {
 		return this.check;
+	}
+	public boolean get_capa_check() {
+		return this.capacity_check;
 	}
 	
 	public String getChoose() {

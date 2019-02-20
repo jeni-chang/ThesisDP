@@ -54,8 +54,6 @@ public class DP {
 			else if(layer < sub_layer) return false;
 			// more check point
 			else if(cp < sub_cp) return false;
-			//
-//			else if(layer!=x-1 && sub_layer<=layer)
 			
 			else return true;
 		}

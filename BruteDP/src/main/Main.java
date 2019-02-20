@@ -11,7 +11,7 @@ public class Main {
 		// TODO Auto-generated method stub\
 		List<Table> table = new ArrayList<>();
 		
-		int layer = 5;
+		int layer = 4;
 		int server = 3;
 		List<Double> pb = new ArrayList<>();
 		List<Double> lc = new ArrayList<>();
@@ -19,34 +19,37 @@ public class Main {
 		List<Double> r = new ArrayList<>();
 		List<Double> bw = new ArrayList<>();
 		List<Double> com = new ArrayList<>();
+		List<Double> ls = new ArrayList<>();
+		List<Double> cs = new ArrayList<>();
+		List<Double> sp = new ArrayList<>();
 		double f = 100; 
 		
 		pb.add(0.0);
-		pb.add(0.3);
+		pb.add(0.4);
+		pb.add(0.95);
 		pb.add(0.5);
-		pb.add(0.8);
-		pb.add(0.1);
+//		pb.add(0.1);
 		pb.add(1.0);
 		
 		lc.add(0.0);
-		lc.add(300.0);
-		lc.add(240.0);
-		lc.add(360.0);
-		lc.add(120.0);
-		lc.add(180.0);
+		lc.add(100.0);
+		lc.add(90.0);
+		lc.add(80.0);
+		lc.add(70.0);
+//		lc.add(180.0);
 		
 		cc.add(0.0);
-		cc.add(400.0);
-		cc.add(350.0);
-		cc.add(280.0);
-		cc.add(160.0);
+		cc.add(85.0);
+		cc.add(75.0);
+		cc.add(65.0);
+//		cc.add(160.0);
 		cc.add(0.0);
 		
 		r.add(1.0);
-		r.add(4.0);
+		r.add(2.0);
+		r.add(1.0);
 		r.add(0.5);
-		r.add(3.0);
-		r.add(1.0);
+//		r.add(1.0);
 		r.add(0.0);
 		
 		bw.add(0.0);
@@ -56,9 +59,27 @@ public class Main {
 		
 		com.add(0.0);
 		com.add(10.0);
-		com.add(12.0);
-		com.add(8.0);
-				
+		com.add(10.0);
+		com.add(10.0);
+		
+		ls.add(0.0);
+		ls.add(10.0);
+		ls.add(9.0);
+		ls.add(8.0);
+		ls.add(7.0);
+//		ls.add(18.0);
+		
+		cs.add(0.0);
+		cs.add(8.5);
+		cs.add(7.5);
+		cs.add(6.5);
+//		cs.add(16.0);
+		cs.add(0.0);
+		
+		sp.add(0.0);
+		sp.add(20.0);
+		sp.add(25.0);
+		sp.add(20.0);				
 		
 		
 		// create table
@@ -94,21 +115,21 @@ public class Main {
 	    }
 	    
 	    
-//	    for(int i : PbCombin.pb_combin.keySet()) {
-//	    	System.out.println(i + " ==> " + PbCombin.pb_combin.get(i));
-//	    }
+	    for(int i : PbCombin.pb_combin.keySet()) {
+	    	System.out.println(i + " ==> " + PbCombin.pb_combin.get(i));
+	    }
 		
 		// check 
 		new DP(table, layer, server);
 		for(int i=1; i<= server; i++) DP.recursive(layer, server, i);
 //		table = r.get_table();
 		
-		BottomUp btmup = new BottomUp(table, pb, lc, cc , r, bw , com, f, layer, server, 3);
-		btmup.compute(1);
+		BottomUp btmup = new BottomUp(table, pb, lc, cc , r, bw , com, f, layer, server, 3, ls , cs, sp);
+		btmup.compute();
 		
 		for(Table t: table) {
 //			if(t.getID() == 23) {
-			if(t.getL() == 5 && t.getS() == 3 && t.getC() == 3) {
+			if(t.getL() == 2 && t.getS() == 2 && t.getC() == 1) {
 				System.out.print(t.toString() + "===>");
 				System.out.println(t.getPb());
 			}

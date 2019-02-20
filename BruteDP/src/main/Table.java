@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +14,10 @@ public class Table {
 	private double ans;
 	private double cost;
 	private double remain;
-	private Map<Double, List<Double>> pb; // <probability, [ans, cost]>
+	private Map<Double, List<Double>> pb; // <probability, [ans, cost, remain data]>
+	private Map<Double, List<Double>> heu_pb; // <probability, [ans, cost, remain data]>
+	private List<List<Double>> ans_tmp; // { [E, cost, remain data], [], ...} 
 	private int id;
-	private String choose = "Begin!!!";
 	private static int cnt = 0;
 	
 	public Table() {
@@ -25,6 +27,8 @@ public class Table {
 		this.check = false;
 		this.capacity_check = true;
 		this.pb = new HashMap<>();
+		this.heu_pb = new HashMap<>();
+		this.ans_tmp = new ArrayList<>();
 	}
 	
 	public void setL(int layer) {
@@ -51,6 +55,10 @@ public class Table {
 		this.pb.put(pb, cost);
 	}
 	
+	public void set_heuPb(double pb, List<Double> cost) {
+		this.heu_pb.put(pb, cost);
+	}
+	
 	public void setcheck(boolean b) {
 		this.check = b;
 	}
@@ -60,12 +68,12 @@ public class Table {
 		this.capacity_check = b;
 	}
 	
-	public void setChoose(String s) {
-		this.choose = s;
-	}
-	
 	public void setRemain(double d) {
 		this.remain = d;
+	}
+	
+	public void set_ans_tmp(List<Double> ls) {
+		this.ans_tmp.add(ls);
 	}
 	
 	public int getID() {
@@ -96,6 +104,10 @@ public class Table {
 		return this.pb;
 	}
 	
+	public Map<Double, List<Double>> get_heuPb() {
+		return this.heu_pb;
+	}
+	
 	public boolean getcheck() {
 		return this.check;
 	}
@@ -103,12 +115,12 @@ public class Table {
 		return this.capacity_check;
 	}
 	
-	public String getChoose() {
-		return this.choose;
-	}
-	
 	public double getRemain() {
 		return this.remain;
+	}
+	
+	public List<List<Double>> get_ans_tmp(){
+		return this.ans_tmp;
 	}
 	
 	@Override

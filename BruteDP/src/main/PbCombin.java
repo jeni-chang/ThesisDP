@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Set;
 public class PbCombin {
 	List<Double> pb;
 	public static Map<Integer, Set<Double>> pb_combin = new HashMap<>();
+	public static List<Double> heu_pb = new ArrayList<>();
 	
 	public PbCombin(List<Double> pb) {
 		this.pb = pb;
@@ -52,6 +54,12 @@ public class PbCombin {
 //			System.out.println(t + " ==> " + remain);
 		}
 		PbCombin.pb_combin.put(i, pbset);
+	}
+	
+	public void create_heuPb(int h) {
+		double cnt = 1.0 / h;		
+		for(int i=1; i<h ; i++) heu_pb.add(cnt*i);
+		heu_pb.add(1.0);
 	}
 	
 }

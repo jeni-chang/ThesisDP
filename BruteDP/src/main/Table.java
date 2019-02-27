@@ -16,7 +16,7 @@ public class Table {
 	private double remain;
 	private Map<Double, List<Double>> pb; // <probability, [ans, cost, remain data]>
 	private Map<Double, List<Double>> heu_pb; // <probability, [ans, cost, remain data]>
-	private List<List<Double>> ans_tmp; // { [E, cost, remain data], [], ...} 
+	private List<List<Double>> ans_tmp; // { [E, cost, remain data, base on which ID, base ID remain data], [], ...} 
 	private List<List<Double>> heu_ans_tmp; // { [E, cost, remain data], [], ...} 
 	private int id;
 	private static int cnt = 0;

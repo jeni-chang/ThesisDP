@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +14,10 @@ public class Main {
 		
 		int layer = 5;
 		int server = 3;
+		int choose = 3;
 		List<Double> pb = new ArrayList<>();
+		List<Double> heu_pb_1 = new ArrayList<>();
+		List<Double> heu_pb_2 = new ArrayList<>();
 		List<Double> lc = new ArrayList<>();
 		List<Double> cc = new ArrayList<>();
 		List<Double> r = new ArrayList<>();
@@ -22,7 +26,7 @@ public class Main {
 		List<Double> ls = new ArrayList<>();
 		List<Double> cs = new ArrayList<>();
 		List<Double> sp = new ArrayList<>();
-		double f = 100; 
+		double f = 100;
 		
 		pb.add(0.0);
 		pb.add(0.3);
@@ -100,12 +104,12 @@ public class Main {
 		cs.add(0.0);
 		
 		sp.add(0.0);
-		sp.add(900.0);
-		sp.add(1000.0);
-		sp.add(1100.0);				
+		sp.add(2000.0);
+		sp.add(2500.0);
+		sp.add(2000.0);				
 		
 		
-		// create table
+		/* create table */
 		for (int c=0; c<=server; c++) {
 			for (int s=1; s<=server; s++) {
 				for(int l=0; l<=layer; l++) {
@@ -117,9 +121,22 @@ public class Main {
 				}
 			}
 		}
+		/*---------------------------------*/
+		/* randomly choose heuristic probability */
+		heu_pb_1.add(0.0);
+		List<Integer> tmp = new ArrayList<>();
+		for(int i=1; i<layer; i++) tmp.add(i);
+		Collections.shuffle(tmp);
+		for(int i=0; i<choose-1; i++) heu_pb_1.add(pb.get(tmp.get(i)));
+		heu_pb_1.add(1.0);
+
+		/* average choose heuristic probability */
+		for(double d: pb) heu_pb_2.add(d);
+		Collections.sort(heu_pb_2);
+		System.out.println("55555555555=====> " + layer/3);
 		
-		// compute probability combination
-		PbCombin cbin = new PbCombin(pb);
+		/* compute probability combination */
+		PbCombin cbin = new PbCombin(pb, heu_pb_1);
 		String s = null;
 		char[] from = new char[layer];
 		for(int i=0; i<layer; i++) {
@@ -133,33 +150,47 @@ public class Main {
 	    PbCombin.pb_combin.put(0, init);
 	    for (int i = 1; i <= from.length; i++) {
 	      s = cbin.comb(from, to, i, from.length, i);
-	      cbin.compute_pb(s, i);
+	      cbin.compute_pb(s, i, 0);
 	    }
 	    
-	    // compute heuristic probability
-	    cbin.create_heuPb(1);
-//	    System.out.println(PbCombin.heu_pb);
+	    /* compute heuristic probability */
 	    
+	    s = null;
+		from = new char[choose];
+		for(int i=0; i<choose; i++) {
+			char c = (char)(i+1+'0');
+			from[i] = c;
+		}
+	    to = new char[from.length];
+	    
+	    init = new HashSet<>();
+	    init.add(1.0);
+	    PbCombin.heu_pb_combin.put(0, init);
+	    for (int i = 1; i <= from.length; i++) {
+	      s = cbin.comb(from, to, i, from.length, i);
+	      cbin.compute_pb(s, i, 1);
+	    }
+	    
+	    System.out.println(PbCombin.heu_pb_combin);
+	    cbin.map_to_list(PbCombin.heu_pb_combin, PbCombin.heu_pb_1);
+	    System.out.println("ggggggggg==>>> " + PbCombin.heu_pb_1);	    
 	    
 	    for(int i : PbCombin.pb_combin.keySet()) {
 	    	System.out.println(i + " ==> " + PbCombin.pb_combin.get(i));
 	    }
-		
-		// check 
+	    /*---------------------------------*/
+		/* compute Brute DP and heuristic DP */ 
 		new DP(table, layer, server);
 		for(int i=1; i<= server; i++) DP.recursive(layer, server, i);
 //		table = r.get_table();
 		
-//		BottomUp btmup = new BottomUp(table, pb, lc, cc , r, bw , com, f, layer, server, 3, ls , cs, sp);
-//		btmup.compute();
 		
-		NewBottomUp btmup = new NewBottomUp(table, pb, lc, cc , r, bw , com, f, layer, server, 3, ls , cs, sp);
+		NewBottomUp btmup = new NewBottomUp(table, pb, lc, cc , r, bw, com, f, layer, server, 3, ls , cs, sp);
 		btmup.init_pb(server);
 		btmup.compute();
 		
 		Table opt = null;
 		for(Table t: table) {
-//			if(t.getID() == 23) {
 			if(t.getL() == 5 && t.getS() == 3 && t.getC() == 3) {
 				System.out.print(t.toString() + "===>");
 				System.out.println(t.getPb());
@@ -168,7 +199,7 @@ public class Main {
 				System.out.println(t.get_heuPb());
 				
 				opt = t;
-				System.out.println(t.get_ans_tmp());
+				System.out.println(t.get_heu_ans_tmp());
 //				for(double d: t.get_heuPb().keySet()) {
 //					for(Double l: t.get_heuPb().get(d)) {
 //						System.out.println(l);
@@ -178,13 +209,17 @@ public class Main {
 				
 			}
 		}
-		
-		// find the optimal
+		/*------------------------------*/
+		/* find the optimal and heuristic optimal*/
 		double min = Double.MAX_VALUE;
 		List<Double> opt_ls = new ArrayList<>(); //[answer, opt_id, probability]
 		opt_ls.add(0.0);
 		opt_ls.add(0.0);
 		opt_ls.add(0.0);
+		List<Double> heu_opt_ls = new ArrayList<>(); //[answer, opt_id, probability]
+		heu_opt_ls.add(0.0);
+		heu_opt_ls.add(0.0);
+		heu_opt_ls.add(0.0);
 		for(List<Double> l: opt.get_ans_tmp()) {
 			if(l.get(0) <= min) {
 				min = l.get(0);
@@ -193,8 +228,18 @@ public class Main {
 				opt_ls.set(2, l.get(4));
 			}
 		}
+		min = Double.MAX_VALUE;
+		for(List<Double> l: opt.get_heu_ans_tmp()) {
+			if(l.get(0) <= min) {
+				min = l.get(0);
+				heu_opt_ls.set(0, l.get(0));
+				heu_opt_ls.set(1, l.get(3));
+				heu_opt_ls.set(2, l.get(4));
+			}
+		}
 		
 		System.out.println("Optimal Solution ==> " + opt_ls);
+		System.out.println("Heuristic Optimal Solution ==> " + heu_opt_ls);
 		
 		// get check point location
 		List<Table> cp_loc = new ArrayList<>();
@@ -203,7 +248,7 @@ public class Main {
 			for(Table t: table) {
 				if(t.getID() == opt_ls.get(1).intValue()) {
 					min = Double.MAX_VALUE;
-					System.out.println(t.toString());
+//					System.out.println(t.toString());
 					cp_loc.add(t);
 					for(List<Double> l: t.get_ans_tmp()) {
 						if(l.get(0) <= min && l.get(2) == opt_ls.get(2)) {
@@ -217,22 +262,75 @@ public class Main {
 				}
 			}
 		}
-		
+		List<Table> heu_cp_loc = new ArrayList<>();
+		heu_cp_loc.add(opt);
+		while(heu_opt_ls.get(1) != -1.0){
+			for(Table t: table) {
+				if(t.getID() == heu_opt_ls.get(1).intValue()) {
+					min = Double.MAX_VALUE;
+//					System.out.println(t.toString());
+					heu_cp_loc.add(t);
+					for(List<Double> l: t.get_heu_ans_tmp()) {
+						if(l.get(0) <= min && l.get(2) == heu_opt_ls.get(2)) {
+							min = l.get(0);
+							heu_opt_ls.set(0, l.get(0));
+							heu_opt_ls.set(1, l.get(3));
+							if(l.get(3) != -1.0)heu_opt_ls.set(2, l.get(4));
+						}
+					}
+					break;
+				}
+			}
+		}
+		// the check point's layer
+		List<Integer> cp_layer = new ArrayList<>();
 		for(int i=0; i<cp_loc.size(); i++) {
 			if(i != cp_loc.size()-1) {
 				if(cp_loc.get(i).getC() - cp_loc.get(i+1).getC() == 1) {
-					System.out.println("ss ==> " + cp_loc.get(i).getL());
+					cp_layer.add(cp_loc.get(i).getL());
 				}
 			}
 			else {
 				if(cp_loc.get(i).getC() ==1) {
-					System.out.println("ss ==> " + cp_loc.get(i).getL());
+					cp_layer.add(cp_loc.get(i).getL());
 				}
 			}
 			
 //			System.out.println("Ans ==> " + cp_loc.get(i).toString());
 		}
+		List<Integer> heu_cp_layer = new ArrayList<>();
+		for(int i=0; i<heu_cp_loc.size(); i++) {
+			if(i != heu_cp_loc.size()-1) {
+				if(heu_cp_loc.get(i).getC() - heu_cp_loc.get(i+1).getC() == 1) {
+					heu_cp_layer.add(heu_cp_loc.get(i).getL());
+				}
+			}
+			else {
+				if(heu_cp_loc.get(i).getC() ==1) {
+					heu_cp_layer.add(heu_cp_loc.get(i).getL());
+				}
+			}
+			
+//			System.out.println("Ans ==> " + cp_loc.get(i).toString());
+		}
+		cp_layer.add(0);
+		heu_cp_layer.add(0);
+		Collections.reverse(cp_layer);
+		Collections.reverse(heu_cp_layer);
+		System.out.println("Opt Ans ==> " + cp_layer);
+		System.out.println("Heuristic Ans ==> " + heu_cp_layer);
 		
+		/* Cloud only */
+		Cloud cloud = new Cloud(pb, lc, cc, bw , com, f);
+		cloud.compute(cp_layer);
+		cloud.compute(heu_cp_layer);
+		cloud.init_compute();
+		
+		/* Device only */
+		Device device = new Device(pb, lc, cc, bw , com, f);
+		device.compute(cp_layer);
+		device.compute(heu_cp_layer);
+		device.init_compute();
 		
 //		int cnt = 0;
 //		for(Table t : table) {

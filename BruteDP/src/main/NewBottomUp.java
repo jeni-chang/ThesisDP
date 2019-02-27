@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewBottomUp {
-private List<Table> table = new ArrayList<>();
-	
+	private List<Table> table = new ArrayList<>();
 	private List<Double> pb = new ArrayList<>();
 	private List<Double> lc = new ArrayList<>();
 	private List<Double> cc = new ArrayList<>();
@@ -48,7 +47,7 @@ private List<Table> table = new ArrayList<>();
 				
 				if(t.getS()==1) {
 					if(check_capacity(t)) {
-						System.out.print("Compute " + t.toString());
+//						System.out.print("Compute " + t.toString());
 						
 						for(int i=1; i<=t.getL(); i++) {
 							ctime = ctime + lc.get(i);
@@ -81,7 +80,7 @@ private List<Table> table = new ArrayList<>();
 					} // end check capacity
 				} // end if
 				else {
-					System.out.print("Compute " + t.toString());
+//					System.out.print("Compute " + t.toString());
 					for(int i=0; i<cnt; i++) {
 						Table tmp = this.table.get(i);
 						if(DP.check(t.getL(), t.getS(), t.getC(), tmp.getL(), tmp.getS(), tmp.getC())) {
@@ -89,7 +88,7 @@ private List<Table> table = new ArrayList<>();
 								if(tmp.get_capa_check() && check_capacity(t, tmp)) {
 									// init
 									//******************
-									System.out.print("==> " + tmp.toString());
+//									System.out.print("==> " + tmp.toString());
 									ctime = 0.0;  // computing time
 									ttime = 0.0;  // transmission time
 									ratio = 1.0;
@@ -166,7 +165,7 @@ private List<Table> table = new ArrayList<>();
 					/*add */
 					fix_pb(t);
 				}// end else
-				System.out.println();
+//				System.out.println();
 			} // end if(t.getcheck())
 		} //end for(Table t: this.table)
 	}
@@ -196,7 +195,7 @@ private List<Table> table = new ArrayList<>();
 			}
 		}
 		// heuristic
-		for(double d : PbCombin.heu_pb) {
+		for(double d : PbCombin.heu_pb_1) {
 			double min = Double.MAX_VALUE;
 			ans_tmp = new ArrayList<>();
 			int flag = 0;
@@ -247,7 +246,7 @@ private List<Table> table = new ArrayList<>();
 		}
 		
 		// heuristic
-		for(double d : PbCombin.heu_pb) {
+		for(double d : PbCombin.heu_pb_1) {
 			if(pb <= d) {
 				if(cost < t.get_heuPb().get(d).get(1)) {
 					t.set_heuPb(d, ls);
@@ -276,7 +275,7 @@ private List<Table> table = new ArrayList<>();
 			}
 			
 			// heuristic probability
-			for(double d : PbCombin.heu_pb) t.set_heuPb(d, tmp);
+			for(double d : PbCombin.heu_pb_1) t.set_heuPb(d, tmp);
 		}
 		
 	}

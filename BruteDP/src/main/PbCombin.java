@@ -10,10 +10,14 @@ import java.util.Set;
 public class PbCombin {
 	List<Double> pb;
 	public static Map<Integer, Set<Double>> pb_combin = new HashMap<>();
-	public static List<Double> heu_pb = new ArrayList<>();
 	
-	public PbCombin(List<Double> pb) {
+	public static List<Double> heu_pb = new ArrayList<>();
+	public static Map<Integer, Set<Double>> heu_pb_combin = new HashMap<>();
+	public static List<Double> heu_pb_1 = new ArrayList<>();
+	
+	public PbCombin(List<Double> pb, List<Double> heu_pb) {
 		this.pb = pb;
+		PbCombin.heu_pb = heu_pb;
 	}
 	
 	public String comb(char[] from, char[] to, int len, int m, int n) {
@@ -38,7 +42,7 @@ public class PbCombin {
 		return result;
 	}
 	
-	public void compute_pb(String s, int i) {
+	public void compute_pb(String s, int i, int version) {
 		// token => [123, 124]
 		String[] token = s.split(":");
 		// t => 123
@@ -48,18 +52,31 @@ public class PbCombin {
 			String[] p = t.split("");
 			double remain = 1.0;
 			for(String pb : p) {
-				remain = remain * (1-this.pb.get(Integer.parseInt(pb)));
+				if(version==0) remain = remain * (1-this.pb.get(Integer.parseInt(pb)));
+				else if(version==1)  remain = remain * (1-PbCombin.heu_pb.get(Integer.parseInt(pb)));
 			}
 			pbset.add(remain);
 //			System.out.println(t + " ==> " + remain);
 		}
-		PbCombin.pb_combin.put(i, pbset);
+		if(version==0) PbCombin.pb_combin.put(i, pbset);
+		else if(version==1) PbCombin.heu_pb_combin.put(i, pbset);
 	}
 	
-	public void create_heuPb(int h) {
-		double cnt = 1.0 / h;		
-		for(int i=1; i<h ; i++) heu_pb.add(cnt*i);
-		heu_pb.add(1.0);
+	public void map_to_list(Map<Integer, Set<Double>> map, List<Double> ls) {
+		for(int i: map.keySet()) {
+			for(double p: map.get(i)) {
+				int flag=0;
+				for(double j: ls) {
+					if(j==p) {
+						flag=1;
+						break;
+					}
+				}
+				if(flag!=1) {
+					ls.add(p);
+				}
+			}
+		}
 	}
 	
 }

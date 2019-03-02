@@ -15,9 +15,16 @@ public class PbCombin {
 	public static Map<Integer, Set<Double>> heu_pb_combin = new HashMap<>();
 	public static List<Double> heu_pb_1 = new ArrayList<>();
 	
-	public PbCombin(List<Double> pb, List<Double> heu_pb) {
+	public static List<Double> heu_pb_init = new ArrayList<>();
+	public static Map<Integer, Set<Double>> heu_pb_combin_2 = new HashMap<>();
+	public static List<Double> heu_pb_2 = new ArrayList<>();
+	
+	
+	
+	public PbCombin(List<Double> pb, List<Double> heu_pb, List<Double> heu_pb2) {
 		this.pb = pb;
-		PbCombin.heu_pb = heu_pb;
+		PbCombin.heu_pb = heu_pb; // initial random probability
+		PbCombin.heu_pb_init = heu_pb2; // initial average probability
 	}
 	
 	public String comb(char[] from, char[] to, int len, int m, int n) {
@@ -54,12 +61,14 @@ public class PbCombin {
 			for(String pb : p) {
 				if(version==0) remain = remain * (1-this.pb.get(Integer.parseInt(pb)));
 				else if(version==1)  remain = remain * (1-PbCombin.heu_pb.get(Integer.parseInt(pb)));
+				else if(version==2)  remain = remain * (1-PbCombin.heu_pb_init.get(Integer.parseInt(pb)));
 			}
 			pbset.add(remain);
 //			System.out.println(t + " ==> " + remain);
 		}
 		if(version==0) PbCombin.pb_combin.put(i, pbset);
 		else if(version==1) PbCombin.heu_pb_combin.put(i, pbset);
+		else if(version==2) PbCombin.heu_pb_combin_2.put(i, pbset);
 	}
 	
 	public void map_to_list(Map<Integer, Set<Double>> map, List<Double> ls) {

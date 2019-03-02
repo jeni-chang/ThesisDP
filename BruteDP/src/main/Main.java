@@ -14,7 +14,7 @@ public class Main {
 		
 		int layer = 5;
 		int server = 3;
-		int choose = 3;
+		double choose = 3;
 		List<Double> pb = new ArrayList<>();
 		List<Double> heu_pb_1 = new ArrayList<>();
 		List<Double> heu_pb_2 = new ArrayList<>();
@@ -131,12 +131,16 @@ public class Main {
 		heu_pb_1.add(1.0);
 
 		/* average choose heuristic probability */
-		for(double d: pb) heu_pb_2.add(d);
-		Collections.sort(heu_pb_2);
-		System.out.println("55555555555=====> " + layer/3);
+		List<Double> heu_tmp = new ArrayList<>();
+		for(double d: pb) heu_tmp.add(d);
+		Collections.sort(heu_tmp);
+		int ceiling = (int) Math.ceil(layer/choose);
+		heu_pb_2.add(0.0);
+		for(int i=1; i<choose; i++) heu_pb_2.add(heu_tmp.get(i*ceiling));
+		heu_pb_2.add(1.0);
 		
 		/* compute probability combination */
-		PbCombin cbin = new PbCombin(pb, heu_pb_1);
+		PbCombin cbin = new PbCombin(pb, heu_pb_1, heu_pb_2);
 		String s = null;
 		char[] from = new char[layer];
 		for(int i=0; i<layer; i++) {
@@ -153,11 +157,11 @@ public class Main {
 	      cbin.compute_pb(s, i, 0);
 	    }
 	    
-	    /* compute heuristic probability */
+	    /* compute heuristic probability version 1 (random) */
 	    
 	    s = null;
-		from = new char[choose];
-		for(int i=0; i<choose; i++) {
+		from = new char[(int)choose];
+		for(int i=0; i<(int)choose; i++) {
 			char c = (char)(i+1+'0');
 			from[i] = c;
 		}
@@ -170,10 +174,29 @@ public class Main {
 	      s = cbin.comb(from, to, i, from.length, i);
 	      cbin.compute_pb(s, i, 1);
 	    }
-	    
-	    System.out.println(PbCombin.heu_pb_combin);
 	    cbin.map_to_list(PbCombin.heu_pb_combin, PbCombin.heu_pb_1);
-	    System.out.println("ggggggggg==>>> " + PbCombin.heu_pb_1);	    
+	    /* compute heuristic probability version 2 (average) */
+	    
+	    s = null;
+		from = new char[(int)choose];
+		for(int i=0; i<(int)choose; i++) {
+			char c = (char)(i+1+'0');
+			from[i] = c;
+		}
+	    to = new char[from.length];
+	    
+	    init = new HashSet<>();
+	    init.add(1.0);
+	    PbCombin.heu_pb_combin_2.put(0, init);
+	    for (int i = 1; i <= from.length; i++) {
+	      s = cbin.comb(from, to, i, from.length, i);
+	      cbin.compute_pb(s, i, 2);
+	    }
+	    
+	    cbin.map_to_list(PbCombin.heu_pb_combin_2, PbCombin.heu_pb_2);
+	    
+	    System.out.println(PbCombin.heu_pb_combin_2);
+	    System.out.println("ggggggggg==>>> " + PbCombin.heu_pb_2);	    
 	    
 	    for(int i : PbCombin.pb_combin.keySet()) {
 	    	System.out.println(i + " ==> " + PbCombin.pb_combin.get(i));

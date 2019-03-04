@@ -16,8 +16,10 @@ public class Table {
 	private double remain;
 	private Map<Double, List<Double>> pb; // <probability, [ans, cost, remain data]>
 	private Map<Double, List<Double>> heu_pb; // <probability, [ans, cost, remain data]>
+	private Map<Double, List<Double>> heu_pb_2; // <probability, [ans, cost, remain data]>
 	private List<List<Double>> ans_tmp; // { [E, cost, remain data, base on which ID, base ID remain data], [], ...} 
 	private List<List<Double>> heu_ans_tmp; // { [E, cost, remain data], [], ...} 
+	private List<List<Double>> heu_ans_tmp_2; // { [E, cost, remain data], [], ...} 
 	private int id;
 	private static int cnt = 0;
 	
@@ -29,8 +31,10 @@ public class Table {
 		this.capacity_check = true;
 		this.pb = new HashMap<>();
 		this.heu_pb = new HashMap<>();
+		this.heu_pb_2 = new HashMap<>();
 		this.ans_tmp = new ArrayList<>();
 		this.heu_ans_tmp = new ArrayList<>();
+		this.heu_ans_tmp_2 = new ArrayList<>();
 	}
 	
 	public void setL(int layer) {
@@ -61,6 +65,10 @@ public class Table {
 		this.heu_pb.put(pb, cost);
 	}
 	
+	public void set_heuPb2(double pb, List<Double> cost) {
+		this.heu_pb_2.put(pb, cost);
+	}
+	
 	public void setcheck(boolean b) {
 		this.check = b;
 	}
@@ -80,6 +88,10 @@ public class Table {
 	
 	public void set_heu_ans_tmp(List<Double> ls) {
 		this.heu_ans_tmp.add(ls);
+	}
+	
+	public void set_heu_ans_tmp2(List<Double> ls) {
+		this.heu_ans_tmp_2.add(ls);
 	}
 	
 	public int getID() {
@@ -114,6 +126,10 @@ public class Table {
 		return this.heu_pb;
 	}
 	
+	public Map<Double, List<Double>> get_heuPb2() {
+		return this.heu_pb_2;
+	}
+	
 	public boolean getcheck() {
 		return this.check;
 	}
@@ -131,6 +147,10 @@ public class Table {
 	
 	public List<List<Double>> get_heu_ans_tmp(){
 		return this.heu_ans_tmp;
+	}
+	
+	public List<List<Double>> get_heu_ans_tmp2(){
+		return this.heu_ans_tmp_2;
 	}
 	
 	@Override

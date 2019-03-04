@@ -20,7 +20,7 @@ public class Device {
 		this.f = f;
 	}
 	
-	public void compute(List<Integer> cp) {
+	public double compute(List<Integer> cp) {
 		List<Integer> cp_layer = cp;
 		List<Double> remain_ls = new ArrayList<>();
 		double cost = 0;
@@ -42,16 +42,20 @@ public class Device {
 			ans = ans + remain_ls.get(i-1)*(cost/com.get(1));
 		}
 		
-		System.out.println("Device  ==>" + ans);
+		return ans;
+		
+//		System.out.println("Device  ==>" + ans);
 	}
 	
-	public void init_compute() {
+	public double init_compute() {
 		double cost =0;
 		// compute time
 		for(int i=0; i<lc.size(); i++) cost = cost + lc.get(i);
 		cost = cost + cc.get(cc.size()-1);
 		cost = cost / com.get(1);
+		
+		return cost;
 
-		System.out.println("Init Device  ==>" + cost);
+//		System.out.println("Init Device  ==>" + cost);
 	}
 }

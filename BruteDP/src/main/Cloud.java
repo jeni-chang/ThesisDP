@@ -20,7 +20,7 @@ public class Cloud {
 		this.f = f;
 	}
 	
-	public void compute(List<Integer> cp) {
+	public double compute(List<Integer> cp) {
 		List<Integer> cp_layer = cp;
 		List<Double> remain_ls = new ArrayList<>();
 		double cost = 0;
@@ -44,10 +44,12 @@ public class Cloud {
 		
 		// transmission time
 		for(int i=1; i<=bw.size()-2; i++) ans = ans + f/bw.get(i) ;
-		System.out.println("Cloud  ==>" + ans);
+		
+		return ans;
+//		System.out.println("Cloud  ==>" + ans);
 	}
 	
-	public void init_compute() {
+	public double init_compute() {
 		double cost =0;
 		// compute time
 		for(int i=0; i<lc.size(); i++) cost = cost + lc.get(i);
@@ -55,7 +57,9 @@ public class Cloud {
 		cost = cost / com.get(com.size()-1);
 		// transmission time
 		for(int i=1; i<=bw.size()-2; i++) cost = cost + f/bw.get(i) ;
+		
+		return cost;
 
-		System.out.println("Init Cloud  ==>" + cost);
+//		System.out.println("Init Cloud  ==>" + cost);
 	}
 }

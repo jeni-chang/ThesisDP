@@ -15,6 +15,7 @@ public class Main {
 		int layer = 5;
 		int server = 3;
 		double choose = 3;
+		double pipeline_threshold = 1000;
 		List<Double> pb = new ArrayList<>();
 		List<Double> heu_pb_1 = new ArrayList<>();
 		List<Double> heu_pb_2 = new ArrayList<>();
@@ -104,9 +105,9 @@ public class Main {
 		cs.add(0.0);
 		
 		sp.add(0.0);
-		sp.add(2000.0);
-		sp.add(2500.0);
-		sp.add(2000.0);				
+		sp.add(90.0);
+		sp.add(100.0);
+		sp.add(110.0);				
 		
 		
 		/* create table */
@@ -195,12 +196,12 @@ public class Main {
 	    
 	    cbin.map_to_list(PbCombin.heu_pb_combin_2, PbCombin.heu_pb_2);
 	    
-	    System.out.println(PbCombin.heu_pb_combin_2);
-	    System.out.println("ggggggggg==>>> " + PbCombin.heu_pb_2);	    
-	    
-	    for(int i : PbCombin.pb_combin.keySet()) {
-	    	System.out.println(i + " ==> " + PbCombin.pb_combin.get(i));
-	    }
+//	    System.out.println(PbCombin.heu_pb_combin_2);
+//	    System.out.println("ggggggggg==>>> " + PbCombin.heu_pb_2);	    
+//	    
+//	    for(int i : PbCombin.pb_combin.keySet()) {
+//	    	System.out.println(i + " ==> " + PbCombin.pb_combin.get(i));
+//	    }
 	    /*---------------------------------*/
 		/* compute Brute DP and heuristic DP */ 
 		new DP(table, layer, server);
@@ -208,27 +209,26 @@ public class Main {
 //		table = r.get_table();
 		
 		
-		NewBottomUp btmup = new NewBottomUp(table, pb, lc, cc , r, bw, com, f, layer, server, 3, ls , cs, sp);
+		NewBottomUp btmup = new NewBottomUp(table, pb, lc, cc , r, bw, com, f, layer, server, 3, ls , cs, sp, pipeline_threshold);
 		btmup.init_pb(server);
 		btmup.compute();
 		
 		Table opt = null;
 		for(Table t: table) {
-			if(t.getL() == 5 && t.getS() == 3 && t.getC() == 3) {
-				System.out.print(t.toString() + "===>");
-				System.out.println(t.getPb());
-				
-				System.out.print(t.toString() + "===>");
-				System.out.println(t.get_heuPb());
+			if(t.getL() == 5 && t.getS() == 3 && t.getC() == 1) {
+//				System.out.print(t.toString() + "===>");
+//				System.out.println(t.getPb());
+//				
+//				System.out.print(t.toString() + "===>");
+//				System.out.println(t.get_heuPb());
+//				
+//				System.out.print(t.toString() + "===>");
+//				System.out.println(t.get_heuPb2());
+
+//				System.out.println(t.get_heu_ans_tmp());
+//				System.out.println(t.get_heuPb().get(1.0).get(1));
 				
 				opt = t;
-				System.out.println(t.get_heu_ans_tmp());
-//				for(double d: t.get_heuPb().keySet()) {
-//					for(Double l: t.get_heuPb().get(d)) {
-//						System.out.println(l);
-//					}
-//				}
-//				System.out.println(t.get_heuPb().get(1.0).get(1));
 				
 			}
 		}
@@ -243,6 +243,10 @@ public class Main {
 		heu_opt_ls.add(0.0);
 		heu_opt_ls.add(0.0);
 		heu_opt_ls.add(0.0);
+		List<Double> heu_opt_ls_2 = new ArrayList<>(); //[answer, opt_id, probability]
+		heu_opt_ls_2.add(0.0);
+		heu_opt_ls_2.add(0.0);
+		heu_opt_ls_2.add(0.0);
 		for(List<Double> l: opt.get_ans_tmp()) {
 			if(l.get(0) <= min) {
 				min = l.get(0);
@@ -260,9 +264,19 @@ public class Main {
 				heu_opt_ls.set(2, l.get(4));
 			}
 		}
+		min = Double.MAX_VALUE;
+		for(List<Double> l: opt.get_heu_ans_tmp2()) {
+			if(l.get(0) <= min) {
+				min = l.get(0);
+				heu_opt_ls_2.set(0, l.get(0));
+				heu_opt_ls_2.set(1, l.get(3));
+				heu_opt_ls_2.set(2, l.get(4));
+			}
+		}
 		
-		System.out.println("Optimal Solution ==> " + opt_ls);
-		System.out.println("Heuristic Optimal Solution ==> " + heu_opt_ls);
+		System.out.println("Optimal Solution ==> " + opt_ls.get(0));
+		System.out.println("Heuristic Optimal Solution Version 1 ==> " + heu_opt_ls.get(0));
+		System.out.println("Heuristic Optimal Solution Version 2 ==> " + heu_opt_ls_2.get(0));
 		
 		// get check point location
 		List<Table> cp_loc = new ArrayList<>();
@@ -305,6 +319,27 @@ public class Main {
 				}
 			}
 		}
+		
+		List<Table> heu_cp_loc_2 = new ArrayList<>();
+		heu_cp_loc_2.add(opt);
+		while(heu_opt_ls_2.get(1) != -1.0){
+			for(Table t: table) {
+				if(t.getID() == heu_opt_ls_2.get(1).intValue()) {
+					min = Double.MAX_VALUE;
+//					System.out.println(t.toString());
+					heu_cp_loc_2.add(t);
+					for(List<Double> l: t.get_heu_ans_tmp2()) {
+						if(l.get(0) <= min && l.get(2) == heu_opt_ls_2.get(2)) {
+							min = l.get(0);
+							heu_opt_ls_2.set(0, l.get(0));
+							heu_opt_ls_2.set(1, l.get(3));
+							if(l.get(3) != -1.0)heu_opt_ls_2.set(2, l.get(4));
+						}
+					}
+					break;
+				}
+			}
+		}
 		// the check point's layer
 		List<Integer> cp_layer = new ArrayList<>();
 		for(int i=0; i<cp_loc.size(); i++) {
@@ -336,40 +371,46 @@ public class Main {
 			
 //			System.out.println("Ans ==> " + cp_loc.get(i).toString());
 		}
+		
+		List<Integer> heu_cp_layer_2 = new ArrayList<>();
+		for(int i=0; i<heu_cp_loc_2.size(); i++) {
+			if(i != heu_cp_loc_2.size()-1) {
+				if(heu_cp_loc_2.get(i).getC() - heu_cp_loc_2.get(i+1).getC() == 1) {
+					heu_cp_layer_2.add(heu_cp_loc_2.get(i).getL());
+				}
+			}
+			else {
+				if(heu_cp_loc_2.get(i).getC() ==1) {
+					heu_cp_layer_2.add(heu_cp_loc_2.get(i).getL());
+				}
+			}
+			
+//			System.out.println("Ans ==> " + cp_loc.get(i).toString());
+		}
+		
 		cp_layer.add(0);
 		heu_cp_layer.add(0);
+		heu_cp_layer_2.add(0);
 		Collections.reverse(cp_layer);
 		Collections.reverse(heu_cp_layer);
-		System.out.println("Opt Ans ==> " + cp_layer);
-		System.out.println("Heuristic Ans ==> " + heu_cp_layer);
+		Collections.reverse(heu_cp_layer_2);
+//		System.out.println("Opt Ans ==> " + cp_layer);
+//		System.out.println("Heuristic version 1 Ans ==> " + heu_cp_layer);
+//		System.out.println("Heuristic version 2 Ans ==> " + heu_cp_layer_2);
 		
 		/* Cloud only */
 		Cloud cloud = new Cloud(pb, lc, cc, bw , com, f);
-		cloud.compute(cp_layer);
-		cloud.compute(heu_cp_layer);
-		cloud.init_compute();
+		System.out.println("Opt cloud ==> " + cloud.compute(cp_layer));
+		System.out.println("Heuristic version 1 cloud ==> " + cloud.compute(heu_cp_layer));
+		System.out.println("Heuristic version 2 cloud ==> " + cloud.compute(heu_cp_layer_2));
+		System.out.println("No check point cloud ==> " + cloud.init_compute());
 		
 		/* Device only */
 		Device device = new Device(pb, lc, cc, bw , com, f);
-		device.compute(cp_layer);
-		device.compute(heu_cp_layer);
-		device.init_compute();
-		
-//		int cnt = 0;
-//		for(Table t : table) {
-////			System.out.print(t.toString());
-//			cnt ++;
-//			if(t.getcheck()) {
-//				System.out.print(t.toString());
-//				System.out.printf("==>(%.2f, %.2f, %.4f) ", t.getAns(), t.getCost(), t.getRemain());
-//			}
-//			if(cnt%5 == 0)System.out.println();
-//			if(cnt%15 == 0)System.out.println();
-//			
-//		}
-		
-		
-		
+		System.out.println("Opt device ==> " + device.compute(cp_layer));
+		System.out.println("Heuristic version 1 device ==> " + device.compute(heu_cp_layer));
+		System.out.println("Heuristic version 2 device ==> " + device.compute(heu_cp_layer_2));
+		System.out.println("No check point device ==> " + device.init_compute());
 	}
 
 }
